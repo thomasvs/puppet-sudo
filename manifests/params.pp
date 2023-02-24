@@ -1,5 +1,6 @@
-#class sudo::params 
-#Set the paramters for the sudo module
+# class sudo::params
+# Set the parameters for the sudo module
+
 class sudo::params {
   $source_base = "puppet:///modules/${module_name}/"
 
@@ -10,7 +11,9 @@ class sudo::params {
           $source = "${source_base}sudoers.ubuntu"
         }
         default: {
-          if (0 + $::operatingsystemmajrelease >= 7) {
+          if ($::operatingsystemmajrelease == 'rodete') {
+            $source = "${source_base}sudoers.debian"
+          } elsif (0 + $::operatingsystemmajrelease >= 7) {
             $source = "${source_base}sudoers.debian"
           } else {
             $source = "${source_base}sudoers.olddebian"
