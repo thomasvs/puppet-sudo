@@ -58,7 +58,7 @@ define sudo::conf(
   }
 
   # sudo skip file name that contain a "."
-  $dname = regsubst($name, '\.', '-', 'G')
+  $dname = regsubst($name, /\./, '-', 'G')
 
   if size("x${priority}") == 2 {
     $priority_real = "0${priority}"
