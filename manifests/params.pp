@@ -4,16 +4,33 @@
 class sudo::params {
   $source_base = "puppet:///modules/${module_name}/"
 
-  case $::osfamily {
-    debian: {
-      case $::operatingsystem {
+  $osfamily = $facts['os']['family'] ? {
+    undef   => $::osfamily,
+    default => $facts['os']['family'],
+  }
+  $operatingsystem = $facts['os']['name'] ? {
+    undef   => $::operatingsystem,
+    default => $facts['os']['name'],
+  }
+  $operatingsystemmajrelease = $facts['os']['release']['major'] ? {
+    undef   => $::operatingsystemmajrelease,
+    default => $facts['os']['release']['major'],
+  }
+  $operatingsystemrelease = $facts['os']['release']['full'] ? {
+    undef   => $::operatingsystemrelease,
+    default => $facts['os']['release']['full'],
+  }
+
+  case $osfamily {
+    /(?i:debian)/: {
+      case $operatingsystem {
         'Ubuntu': {
           $source = "${source_base}sudoers.ubuntu"
         }
         default: {
-          if ($::operatingsystemmajrelease == 'rodete') {
+          if ($operatingsystemmajrelease == 'rodete') {
             $source = "${source_base}sudoers.debian"
-          } elsif (0 + $::operatingsystemmajrelease >= 7) {
+          } elsif (0 + $operatingsystemmajrelease >= 7) {
             $source = "${source_base}sudoers.debian"
           } else {
             $source = "${source_base}sudoers.olddebian"
