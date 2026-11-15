@@ -63,7 +63,7 @@ define sudo::conf (
   }
 
   # sudo skip file name that contain a "."
-  $dname = regsubst($_name_suffix, '\.', '-', 'G')
+  $dname = regsubst($_name_suffix, /\./, '-', 'G')
 
   # Prepend prefix
   if $sudo::prefix {
@@ -86,7 +86,7 @@ define sudo::conf (
   }
 
   # replace whitespace in file name
-  $cur_file_real = regsubst($cur_file, '\s+', '_', 'G')
+  $cur_file_real = regsubst($cur_file, /\s+/, '_', 'G')
 
   if $content != undef {
     if $content =~ Array {
