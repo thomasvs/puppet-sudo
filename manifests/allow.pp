@@ -62,12 +62,12 @@ class sudo::allow(
   if $replace_users != undef {
     $users = $replace_users
   } else {
-    $users = lookup("${module_name}::allow::add_users", Array, 'unique', $add_users)
+    $users = sudo_lookup("${module_name}::allow::add_users", { 'merge' => 'unique', 'default_value' => $add_users })
   }
   if $replace_groups != undef {
     $groups = $replace_groups
   } else {
-    $groups = lookup("${module_name}::allow::add_groups", Array, 'unique', $add_groups)
+    $groups = sudo_lookup("${module_name}::allow::add_groups", { 'merge' => 'unique', 'default_value' => $add_groups })
   }
 
   sudo::conf { 'sudo_users_groups':

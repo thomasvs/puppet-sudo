@@ -17,7 +17,7 @@ class sudo::configs (
   # http://docs.puppetlabs.com/hiera/1/puppet.html#limitations
   # https://tickets.puppetlabs.com/browse/HI-118
   #
-  $configs = lookup('sudo::configs', Hash, 'hash', $configs_hash)
+  $configs = sudo_lookup('sudo::configs', { 'merge' => 'hash', 'default_value' => $configs_hash })
 
   if !empty($configs) {
     create_resources('sudo::conf', $configs)

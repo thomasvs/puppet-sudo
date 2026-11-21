@@ -58,7 +58,7 @@ define sudo::conf(
   }
 
   # sudo skip file name that contain a "."
-  $dname = regsubst($name, /\./, '-', 'G')
+  $dname = join(split($name, '[.]'), '-')
 
   if size("x${priority}") == 2 {
     $priority_real = "0${priority}"
@@ -75,9 +75,15 @@ define sudo::conf(
 
   Class['sudo'] -> Sudo::Conf[$name]
 
-  if $::osfamily == 'RedHat' {
-    if (versioncmp($::sudoversion, '1.7.2p1') < 0) {
-      warning("Found sudo with version ${::sudoversion}, but at least version 1.7.2p1 is required!")
+  if $facts != undef {
+    $sudoversion = $facts['sudoversion']
+  } else {
+    $sudoversion = $::sudoversion
+  }
+
+  if $sudo::params::osfamily == 'RedHat' {
+    if ($sudoversion != undef) and (versioncmp($sudoversion, '1.7.2p1') < 0) {
+      warning("Found sudo with version ${sudoversion}, but at least version 1.7.2p1 is required!")
     }
   }
 

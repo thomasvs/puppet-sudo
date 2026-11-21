@@ -4,21 +4,16 @@
 class sudo::params {
   $source_base = "puppet:///modules/${module_name}/"
 
-  $osfamily = $facts['os']['family'] ? {
-    undef   => $::osfamily,
-    default => $facts['os']['family'],
-  }
-  $operatingsystem = $facts['os']['name'] ? {
-    undef   => $::operatingsystem,
-    default => $facts['os']['name'],
-  }
-  $operatingsystemmajrelease = $facts['os']['release']['major'] ? {
-    undef   => $::operatingsystemmajrelease,
-    default => $facts['os']['release']['major'],
-  }
-  $operatingsystemrelease = $facts['os']['release']['full'] ? {
-    undef   => $::operatingsystemrelease,
-    default => $facts['os']['release']['full'],
+  if $facts != undef {
+    $osfamily                  = $facts['os']['family']
+    $operatingsystem           = $facts['os']['name']
+    $operatingsystemmajrelease = $facts['os']['release']['major']
+    $operatingsystemrelease    = $facts['os']['release']['full']
+  } else {
+    $osfamily                  = $::osfamily
+    $operatingsystem           = $::operatingsystem
+    $operatingsystemmajrelease = $::operatingsystemmajrelease
+    $operatingsystemrelease    = $::operatingsystemrelease
   }
 
   case $osfamily {
@@ -45,13 +40,13 @@ class sudo::params {
       $config_dir        = '/etc/sudoers.d/'
       $config_file_group = 'root'
     }
-    redhat: {
+    /(?i:redhat)/: {
       $package = 'sudo'
 
       # rhel 5.0 to 5.4 use sudo 1.6.9 which does not support
       # includedir, so we have to make sure sudo 1.7 (comes with rhel
       # 5.5) is installed.
-      $package_ensure = $::operatingsystemrelease ? {
+      $package_ensure = $operatingsystemrelease ? {
         /^5.[01234]/ => 'latest',
         default      => 'present',
       }
@@ -59,7 +54,7 @@ class sudo::params {
       $package_admin_file = ''
       $config_file = '/etc/sudoers'
       $config_dir = '/etc/sudoers.d/'
-      $source = $::operatingsystemrelease ? {
+      $source = $operatingsystemrelease ? {
         /^5/    => "${source_base}sudoers.rhel5",
         /^6/    => "${source_base}sudoers.rhel6",
         /^7/    => "${source_base}sudoers.rhel7",
@@ -149,7 +144,7 @@ class sudo::params {
       $config_file_group = 'system'
     }
     default: {
-      case $::operatingsystem {
+      case $operatingsystem {
         gentoo: {
           $package = 'sudo'
           $package_ensure = 'present'
@@ -171,7 +166,7 @@ class sudo::params {
           $package_ensure = 'present'
           $config_file = '/etc/sudoers'
           $config_dir = '/etc/sudoers.d/'
-          $source = $::operatingsystemrelease ? {
+          $source = $operatingsystemrelease ? {
             /^5/    => "${source_base}sudoers.rhel5",
             /^6/    => "${source_base}sudoers.rhel6",
             default => "${source_base}sudoers.rhel6",
@@ -179,7 +174,7 @@ class sudo::params {
           $config_file_group = 'root'
         }
         default: {
-          fail("Unsupported platform: ${::osfamily}/${::operatingsystem}")
+          fail("Unsupported platform: ${osfamily}/${operatingsystem}")
         }
       }
       $package_source = ''

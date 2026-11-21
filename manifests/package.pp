@@ -36,7 +36,13 @@ class sudo::package(
   $package_admin_file = '',
   ) {
 
-  case $::osfamily {
+  if $facts != undef {
+    $osfamily = $facts['os']['family']
+  } else {
+    $osfamily = $::osfamily
+  }
+
+  case $osfamily {
     aix: {
       class { 'sudo::package::aix':
         package        => $package,

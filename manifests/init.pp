@@ -133,7 +133,7 @@ class sudo(
     require => Package[$package],
   }
 
-  if $config_file_replace == false and $::osfamily == 'RedHat' and $::operatingsystemmajrelease == '5' {
+  if $config_file_replace == false and $sudo::params::osfamily == 'RedHat' and $sudo::params::operatingsystemmajrelease == '5' {
     augeas { 'includedirsudoers':
       changes => ['set /files/etc/sudoers/#includedir /etc/sudoers.d'],
       incl    => $config_file,
@@ -152,7 +152,13 @@ class sudo(
   #
   #   http://projects.puppetlabs.com/issues/12345
   #
-  if (versioncmp($::puppetversion, '3') != -1) {
+  if $facts != undef {
+    $puppet_version = $facts['puppetversion']
+  } else {
+    $puppet_version = $::puppetversion
+  }
+
+  if (versioncmp($puppet_version, '3') != -1) {
     include 'sudo::configs'
   }
 
